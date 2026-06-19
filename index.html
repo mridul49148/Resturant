@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ember & Spice — Fine Dining</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --charcoal: #1a1714;
+      --ember: #c0410b;
+      --gold: #d4a847;
+      --cream: #f5f0e8;
+      --smoke: #2e2b28;
+      --mist: #7a7470;
+      --white: #ffffff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--charcoal);
+      color: var(--cream);
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 5vw;
+      background: rgba(26,23,20,0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(212,168,71,0.15);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--gold);
+      letter-spacing: 0.03em;
+    }
+    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+    .nav-links a {
+      color: var(--cream); text-decoration: none;
+      font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase;
+      font-weight: 400; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-cta {
+      background: var(--ember); color: var(--white);
+      padding: 0.55rem 1.4rem; border-radius: 2px;
+      font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none; font-weight: 500;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: #a33509; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 0 10vw;
+      background: linear-gradient(135deg, var(--charcoal) 55%, #2a1a10 100%);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -20%; right: -10%;
+      width: 55vw; height: 110vh;
+      background: radial-gradient(ellipse at center, rgba(192,65,11,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.6rem; font-weight: 500;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 7vw, 6rem);
+      line-height: 1.08; font-weight: 700;
+      max-width: 680px; margin-bottom: 1.8rem;
+    }
+    .hero h1 em {
+      font-style: italic; color: var(--ember);
+    }
+    .hero-sub {
+      font-size: 1.05rem; line-height: 1.7;
+      color: var(--mist); max-width: 420px;
+      margin-bottom: 2.8rem; font-weight: 300;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--ember); color: var(--white);
+      padding: 0.9rem 2.2rem; border-radius: 2px;
+      font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none; font-weight: 500; transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #a33509; }
+    .btn-ghost {
+      border: 1px solid var(--gold); color: var(--gold);
+      padding: 0.9rem 2.2rem; border-radius: 2px;
+      font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none; font-weight: 400; transition: all 0.2s;
+    }
+    .btn-ghost:hover { background: var(--gold); color: var(--charcoal); }
+    .hero-scroll {
+      position: absolute; bottom: 2.5rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--mist);
+    }
+    .scroll-line {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--mist), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+    /* SECTION COMMON */
+    section { padding: 7rem 10vw; }
+    .section-label {
+      font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--ember); margin-bottom: 1rem; font-weight: 500;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem); font-weight: 700;
+      line-height: 1.15; margin-bottom: 1.2rem;
+    }
+    .section-sub {
+      color: var(--mist); font-size: 1rem; line-height: 1.75;
+      max-width: 540px; font-weight: 300;
+    }
+
+    /* ABOUT */
+    .about { background: var(--smoke); display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+    .about-image {
+      position: relative;
+    }
+    .about-img-box {
+      width: 100%; aspect-ratio: 3/4;
+      background: linear-gradient(135deg, #3a2518, #1a1714);
+      border-radius: 2px; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 6rem;
+    }
+    .about-accent {
+      position: absolute; bottom: -1.5rem; right: -1.5rem;
+      width: 60%; aspect-ratio: 1;
+      border: 2px solid var(--gold); border-radius: 2px;
+      z-index: -1; opacity: 0.4;
+    }
+    .about-stats {
+      display: flex; gap: 2.5rem; margin-top: 2.5rem;
+    }
+    .stat { display: flex; flex-direction: column; gap: 0.2rem; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem; font-weight: 700; color: var(--gold);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--mist);
+    }
+
+    /* MENU */
+    .menu { background: var(--charcoal); }
+    .menu-header { margin-bottom: 3.5rem; }
+    .menu-tabs {
+      display: flex; gap: 0; margin-bottom: 3rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .tab {
+      padding: 0.75rem 1.8rem;
+      font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+      cursor: pointer; background: none; border: none;
+      color: var(--mist); transition: color 0.2s; font-family: inherit;
+      position: relative;
+    }
+    .tab.active { color: var(--gold); }
+    .tab.active::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 2px; background: var(--gold);
+    }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5px; background: rgba(255,255,255,0.06); }
+    .menu-item {
+      background: var(--charcoal);
+      padding: 2rem; display: flex; flex-direction: column; gap: 0.6rem;
+      transition: background 0.2s;
+    }
+    .menu-item:hover { background: var(--smoke); }
+    .menu-item-top { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+    .menu-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 400;
+    }
+    .menu-price { color: var(--gold); font-size: 1rem; font-weight: 500; white-space: nowrap; }
+    .menu-desc { color: var(--mist); font-size: 0.85rem; line-height: 1.65; font-weight: 300; }
+    .menu-tag {
+      display: inline-block; font-size: 0.62rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--ember);
+      border: 1px solid rgba(192,65,11,0.4);
+      padding: 0.15rem 0.5rem; border-radius: 1px; width: fit-content;
+    }
+
+    /* SPECIALS */
+    .specials {
+      background: var(--smoke);
+      display: flex; flex-direction: column; gap: 3.5rem;
+    }
+    .specials-inner { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; margin-top: 1rem; }
+    .special-card {
+      padding: 2.5rem 2rem;
+      border: 1px solid rgba(212,168,71,0.15);
+      border-radius: 2px; display: flex; flex-direction: column; gap: 1rem;
+      transition: border-color 0.2s;
+    }
+    .special-card:hover { border-color: rgba(212,168,71,0.5); }
+    .special-icon { font-size: 2.2rem; }
+    .special-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; font-weight: 700;
+    }
+    .special-text { color: var(--mist); font-size: 0.9rem; line-height: 1.7; font-weight: 300; }
+
+    /* GALLERY */
+    .gallery { background: var(--charcoal); padding: 5rem 0; overflow: hidden; }
+    .gallery-header { padding: 0 10vw; margin-bottom: 2.5rem; }
+    .gallery-strip {
+      display: flex; gap: 1rem; padding: 0 10vw;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .gallery-strip::-webkit-scrollbar { display: none; }
+    .gallery-cell {
+      flex: 0 0 280px; aspect-ratio: 3/4;
+      background: linear-gradient(135deg, #3a2518, #2e2520);
+      border-radius: 2px; display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem;
+    }
+
+    /* RESERVATION */
+    .reservation {
+      background: linear-gradient(135deg, #1a0f08 0%, var(--charcoal) 50%, #0e1214 100%);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start;
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+    .form-grid .full { grid-column: 1 / -1; }
+    .field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .field label { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--mist); }
+    .field input, .field select, .field textarea {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 2px; padding: 0.75rem 1rem;
+      color: var(--cream); font-family: inherit; font-size: 0.9rem;
+      outline: none; transition: border-color 0.2s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--gold);
+    }
+    .field select option { background: var(--charcoal); }
+    .field textarea { resize: vertical; min-height: 100px; }
+    .form-btn {
+      grid-column: 1/-1; background: var(--ember); color: var(--white);
+      padding: 1rem; border: none; border-radius: 2px; cursor: pointer;
+      font-family: inherit; font-size: 0.82rem; letter-spacing: 0.12em;
+      text-transform: uppercase; font-weight: 500; transition: background 0.2s;
+    }
+    .form-btn:hover { background: #a33509; }
+    .res-info { display: flex; flex-direction: column; gap: 2rem; margin-top: 2rem; }
+    .res-info-item { display: flex; flex-direction: column; gap: 0.35rem; }
+    .res-info-label { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ember); }
+    .res-info-val { font-size: 1rem; font-weight: 300; line-height: 1.6; }
+
+    /* FOOTER */
+    footer {
+      background: #0e0c0a;
+      padding: 3rem 10vw 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1.5rem;
+      border-top: 1px solid rgba(212,168,71,0.1);
+    }
+    .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--gold); }
+    .footer-links { display: flex; gap: 2rem; list-style: none; flex-wrap: wrap; }
+    .footer-links a { color: var(--mist); text-decoration: none; font-size: 0.8rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--cream); }
+    .footer-copy { color: var(--mist); font-size: 0.75rem; width: 100%; text-align: center; padding-top: 1rem; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 5vw; }
+      .nav-links { display: none; }
+      section { padding: 5rem 6vw; }
+      .about { grid-template-columns: 1fr; gap: 3rem; }
+      .specials-inner { grid-template-columns: 1fr; }
+      .reservation { grid-template-columns: 1fr; gap: 3rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Ember & Spice</div>
+  <ul class="nav-links">
+    <li><a href="#about">Story</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#specials">Experience</a></li>
+    <li><a href="#reservation">Reserve</a></li>
+  </ul>
+  <a href="#reservation" class="nav-cta">Book a Table</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Fine Dining · New Delhi</div>
+  <h1>Where fire meets<br><em>flavour.</em></h1>
+  <p class="hero-sub">A marriage of live-fire cooking and seasonal Indian ingredients — served in a room worth dressing for.</p>
+  <div class="hero-actions">
+    <a href="#menu" class="btn-primary">Explore Menu</a>
+    <a href="#reservation" class="btn-ghost">Reserve Tonight</a>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-image">
+    <div class="about-img-box">🔥</div>
+    <div class="about-accent"></div>
+  </div>
+  <div>
+    <div class="section-label">Our Story</div>
+    <h2 class="section-title">Born from the tandoor, refined by time.</h2>
+    <p class="section-sub" style="margin-bottom:1.2rem">Ember & Spice began as a single wood-fired clay oven in a courtyard kitchen. Today we carry that same obsession forward — charring, smoking, slow-cooking — guided by chefs who trained from Lucknow to Lyon.</p>
+    <p class="section-sub">Every dish on our menu has a story rooted in a region, a season, or a grandmother's memory. We don't just cook food — we restore it.</p>
+    <div class="about-stats">
+      <div class="stat"><span class="stat-num">12</span><span class="stat-label">Years Open</span></div>
+      <div class="stat"><span class="stat-num">48</span><span class="stat-label">Seats Only</span></div>
+      <div class="stat"><span class="stat-num">3</span><span class="stat-label">Michelin Stars</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section class="menu" id="menu">
+  <div class="menu-header">
+    <div class="section-label">What We Serve</div>
+    <h2 class="section-title">The Menu</h2>
+  </div>
+  <div class="menu-tabs">
+    <button class="tab active">Starters</button>
+    <button class="tab">Mains</button>
+    <button class="tab">Desserts</button>
+    <button class="tab">Drinks</button>
+  </div>
+  <div class="menu-grid" id="menu-grid">
+    <!-- JS fills this -->
+  </div>
+</section>
+
+<!-- SPECIALS / EXPERIENCE -->
+<section class="specials" id="specials">
+  <div>
+    <div class="section-label">The Experience</div>
+    <h2 class="section-title">More than a meal.</h2>
+    <p class="section-sub">Three ways to dine with us — each designed around a different kind of evening.</p>
+  </div>
+  <div class="specials-inner">
+    <div class="special-card">
+      <div class="special-icon">🕯️</div>
+      <div class="special-title">Chef's Table</div>
+      <p class="special-text">Six seats around the open kitchen. Watch the fire work. Seven courses, no menu — just what the kitchen feels like cooking tonight.</p>
+    </div>
+    <div class="special-card">
+      <div class="special-icon">🌿</div>
+      <div class="special-title">Garden Terrace</div>
+      <p class="special-text">Seasonal dining under the stars. A shorter, lighter menu built around what arrived from the farm that morning.</p>
+    </div>
+    <div class="special-card">
+      <div class="special-icon">🥃</div>
+      <div class="special-title">The Bar</div>
+      <p class="special-text">Indian single malts, curated natural wines, and a small bar menu available until midnight. Walk-ins welcome.</p>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery" style="padding:5rem 0;">
+  <div class="gallery-header">
+    <div class="section-label">Inside the Kitchen</div>
+    <h2 class="section-title">A glimpse.</h2>
+  </div>
+  <div class="gallery-strip">
+    <div class="gallery-cell">🍖</div>
+    <div class="gallery-cell">🍛</div>
+    <div class="gallery-cell">🌶️</div>
+    <div class="gallery-cell">🍷</div>
+    <div class="gallery-cell">🫕</div>
+    <div class="gallery-cell">🍰</div>
+  </div>
+</section>
+
+<!-- RESERVATION -->
+<section class="reservation" id="reservation">
+  <div>
+    <div class="section-label">Reserve a Table</div>
+    <h2 class="section-title">Join us for dinner.</h2>
+    <p class="section-sub">We seat 48 guests per evening. Reservations are strongly recommended, especially on weekends.</p>
+    <div class="res-info">
+      <div class="res-info-item">
+        <span class="res-info-label">Address</span>
+        <span class="res-info-val">12, Mehrauli–Gurgaon Road<br>Vasant Kunj, New Delhi 110070</span>
+      </div>
+      <div class="res-info-item">
+        <span class="res-info-label">Hours</span>
+        <span class="res-info-val">Lunch: 12:00 – 3:00 PM<br>Dinner: 7:00 – 11:30 PM<br>Closed Mondays</span>
+      </div>
+      <div class="res-info-item">
+        <span class="res-info-label">Phone</span>
+        <span class="res-info-val">+91 11 4567 8900</span>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="form-grid">
+      <div class="field"><label>First Name</label><input type="text" placeholder="Mridul"/></div>
+      <div class="field"><label>Last Name</label><input type="text" placeholder="Singh"/></div>
+      <div class="field"><label>Email</label><input type="email" placeholder="you@email.com"/></div>
+      <div class="field"><label>Phone</label><input type="tel" placeholder="+91 98765 43210"/></div>
+      <div class="field"><label>Date</label><input type="date"/></div>
+      <div class="field"><label>Time</label>
+        <select>
+          <option>7:00 PM</option><option>7:30 PM</option>
+          <option>8:00 PM</option><option>8:30 PM</option>
+          <option>9:00 PM</option><option>9:30 PM</option>
+        </select>
+      </div>
+      <div class="field"><label>Guests</label>
+        <select>
+          <option>1 Guest</option><option>2 Guests</option>
+          <option>3 Guests</option><option>4 Guests</option>
+          <option>5+ Guests</option>
+        </select>
+      </div>
+      <div class="field"><label>Occasion</label>
+        <select>
+          <option>Just Dinner</option><option>Birthday</option>
+          <option>Anniversary</option><option>Business Meal</option>
+        </select>
+      </div>
+      <div class="field full"><label>Special Requests</label>
+        <textarea placeholder="Dietary needs, seating preferences, allergies…"></textarea>
+      </div>
+      <button class="form-btn full">Confirm Reservation</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Ember & Spice</div>
+  <ul class="footer-links">
+    <li><a href="#about">Story</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#specials">Experience</a></li>
+    <li><a href="#reservation">Reserve</a></li>
+    <li><a href="#">Press</a></li>
+    <li><a href="#">Careers</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 Ember & Spice. All rights reserved.</div>
+</footer>
+
+<script>
+  // Menu data
+  const menuData = {
+    Starters: [
+      { name: "Smoked Tikka Amuse", price: "₹480", desc: "Miniature chicken tikka smoked over applewood, mint chutney snow.", tag: "Chef's Pick" },
+      { name: "Burrata & Achaar", price: "₹620", desc: "Buffalo burrata, mango achaar oil, toasted sourdough." },
+      { name: "Dal Shorba", price: "₹380", desc: "Slow-cooked black lentil broth, crisped curry leaf, smoked butter." },
+      { name: "Crab Koliwada", price: "₹880", desc: "Mumbai-style spiced crab fritter, coconut kachumber.", tag: "Seasonal" },
+      { name: "Garden Chaat", price: "₹440", desc: "Market greens, tamarind gel, puffed amaranth, date cream.", tag: "Vegan" },
+      { name: "Bone Marrow Naan", price: "₹560", desc: "Roasted bone marrow, cultured butter, tandoor-charred bread." },
+    ],
+    Mains: [
+      { name: "Raan-e-Ember", price: "₹2,200", desc: "Slow-roasted lamb leg, 12 hours. Saffroned jus, pomegranate.", tag: "Signature" },
+      { name: "Black Cod Moilee", price: "₹1,600", desc: "Miso-marinated cod, Kerala coconut moilee, banana blossom." },
+      { name: "Dal Makhani Risotto", price: "₹980", desc: "Overnight dal makhani folded into arborio. Aged parmesan, truffle.", tag: "Vegetarian" },
+      { name: "Duck Saag", price: "₹1,400", desc: "Confit duck leg, wild mustard greens, Kashmiri chilli oil." },
+      { name: "Lobster Biryani", price: "₹2,800", desc: "Whole lobster tail, Basmati dum biryani, saffron, rose water.", tag: "Chef's Pick" },
+      { name: "Jackfruit Nihari", price: "₹860", desc: "Young jackfruit slow-braised in nihari spices, bone-less bread.", tag: "Vegan" },
+    ],
+    Desserts: [
+      { name: "Gulab Soufflé", price: "₹520", desc: "Rose water soufflé, iced cardamom cream, pistachio praline.", tag: "Signature" },
+      { name: "Dark Halwa", price: "₹380", desc: "72% single-origin chocolate halwa, sea salt, tahini ice cream." },
+      { name: "Mishti Doi Panna Cotta", price: "₹420", desc: "Bengali sweet curd set cream, caramelised mango." },
+      { name: "Cheese Trolley", price: "₹680", desc: "Selection of Indian artisan cheeses, quince, walnut lavash." },
+    ],
+    Drinks: [
+      { name: "Amrut Single Malt", price: "₹1,200", desc: "30ml pour, Amrut Fusion, hand-chipped ice." },
+      { name: "Spiced Negroni", price: "₹680", desc: "Gin, turmeric Campari, smoked vermouth, orange peel." },
+      { name: "Kesar Lassi", price: "₹280", desc: "House cultured yogurt, saffron, cardamom. Non-alcoholic.", tag: "NA" },
+      { name: "Natural Wine Selection", price: "From ₹720", desc: "Rotating list of natural and biodynamic wines, India & France." },
+    ]
+  };
+
+  let activeTab = 'Starters';
+
+  function renderMenu() {
+    const grid = document.getElementById('menu-grid');
+    grid.innerHTML = menuData[activeTab].map(item => `
+      <div class="menu-item">
+        <div class="menu-item-top">
+          <span class="menu-name">${item.name}</span>
+          <span class="menu-price">${item.price}</span>
+        </div>
+        <p class="menu-desc">${item.desc}</p>
+        ${item.tag ? `<span class="menu-tag">${item.tag}</span>` : ''}
+      </div>
+    `).join('');
+  }
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeTab = tab.textContent;
+      renderMenu();
+    });
+  });
+
+  renderMenu();
+</script>
+</body>
+</html>
